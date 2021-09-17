@@ -1,14 +1,14 @@
 
 ## Multi-Agent Search in Pacman Python project for CPSC 471/510
 
-Fork this project into your private group, clone your fork into your user space, make changes as needed, commit, and push to your fork.
+Fork this project into your private *COURSE* group, clone your fork into your user space, make changes as needed, commit, and push to your fork.
 
 Directions are here, but can also be viewed at  http://ai.berkeley.edu/multiagent.html for basic description
 
 > Note: We will use Python 3 and gitlab in this course!
 
 
-For grading, I will have a script that clones your fork (master branch), and runs the auto grader script.
+For grading, I will have a script that clones your fork (main branch), and runs the auto grader script.
 
 You can grade yourself using
 <pre><code>
@@ -16,6 +16,12 @@ python autograder.py
 </code></pre>
 
 ***
+## Git Usage
+
+In addition to the points assigned by the autograder I will be assigning points based on proper Git usage.
+
+You must have at least 5 commits with reasonable commit messages spread across the project.
+It is expected that you will have at least 1 commit after completing each question.
 
 ## Project 2: Multi-Agent Pacman
 
