@@ -75,10 +75,72 @@ class ReflexAgent(Agent):
         new_food = successor_game_state.get_food()
         new_ghost_states = successor_game_state.get_ghost_states()
         new_scared_times = [ghost_state.scared_timer for ghost_state in new_ghost_states]
+        # print('successor_game_state.get_score()')
+        # print(successor_game_state.get_score())
+        # print('new_pos')
+        # print(new_pos)
+        # print('new_food')
+        # print(new_food.as_list())
+        # print('new_ghost_states')
+        # print(new_ghost_states.get_ghost_state)
+        # print('new_scared_times')
+        # print(new_scared_times)
 
         # *** YOUR CODE HERE ***
+        # return successor_game_state.get_score()
+        score = 0
+        if successor_game_state.is_win():
+            return 999999
 
-        return successor_game_state.get_score()
+        # check ghost positions
+        # manhattan_distance(xy1, xy2):
+        # new_food.asList()
+        foodLocations = new_food.as_list()
+        ghostStates = []
+        distanceFromGhostNextState = []
+        distanceFromGhostCurrentState = []
+
+        # need distance to ghosts
+        # this is the next state location of ghosties
+        for ghostLoc in new_ghost_states:
+            # print(ghostLoc.get_position())
+            distance = manhattan_distance(new_pos, ghostLoc.get_position())
+            distanceFromGhostNextState.append(distance)
+
+        #current state location of ghosties
+        for ghostLoc in current_game_state.get_ghost_states():
+            distance = manhattan_distance(new_pos, ghostLoc.get_position())
+            distanceFromGhostCurrentState.append(distance)
+
+        # need distance to food
+        distanceFromFood = []
+        for foodLoc in foodLocations:
+            distance = manhattan_distance(new_pos, foodLoc)
+            # print('distance')
+            # print(distance)
+            distanceFromFood.append(distance)
+
+        # How to set up score? Just random numbers I come up with?
+
+
+        # Probably need to do something with pellets
+        # Need to add/remove from score based on these things
+
+        # if ghosts are scared need to make score better when closer to the ghosties
+
+        # if ghosts are not scared make score worse when close
+
+        # if food nearby score better
+
+        # if food far away score worse
+
+        # if pellet ? score better (probably same as food)
+
+
+
+
+
+        return score
 
 
 def score_evaluation_function(current_game_state):
