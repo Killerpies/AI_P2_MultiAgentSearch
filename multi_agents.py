@@ -236,60 +236,64 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
 
         # *** YOUR CODE HERE ***
-        alpha = float("-inf")
-        beta = float("+inf")
+        returnvalue = self.maxval(game_state, 0, 0, float("-inf"), float("inf"))
+        return returnvalue[0]
 
-        return self.max_value(game_state, 0, alpha, beta)
-
-    def max_value(self, game_state, depth, alpha, beta):
-        if game_state.is_win() or game_state.is_lose():
-            return game_state.get_score()
-        actions = game_state.get_legal_actions(0)
-        # max func starts with -inf
-        tempscore = highestScore = float("-inf")
-        best_action = Directions.STOP
-        for action in actions:
-            # score = min function
-            tempscore = self.min_value_recursive(game_state.generate_successor(0, action), depth, 1)
-            # get max score here
-            if tempscore > highestScore:
-                highestScore = tempscore
-                best_action = action
-        # if depth is 0 then we found the best action
-        if depth == 0:
-            return best_action
+    def minimax_alphaBeta(self, game_state, agent, depth, alpha, beta):
+        # This problem still took 10 years but this function makes it significantly easier
+        # Compared to the way i did it on the last one
+        if depth == self.depth * game_state.get_num_agents() or game_state.is_lose() or game_state.is_win():
+            a = self.evaluation_function(game_state)
+            print(a)
+            return a
+        if agent == game_state.get_num_agents():
+            agent = 0
+        if agent == 0:
+            a = self.maxval(game_state, agent, depth, alpha, beta)
+            # print(a)
+            return a[1]
         else:
-            # otherwise return the highscore back to min function
-            return highestScore
+            a = self.minval(game_state, agent, depth, alpha, beta)
+            return a[1]
 
-    def min_value_recursive(self, game_state, depth, agent, alpha, beta):
-        if game_state.is_lose() or game_state.is_win():
-            return game_state.get_score()
-        # increment agent index + 1
-        nextAgent = agent + 1
-        # if at the end of agent list, reset back to pacman
-        if agent == game_state.get_num_agents() - 1:
-            nextAgent = 0
+    def maxval(self, game_state, agent, depth, alpha, beta):
+        highestScore = ("action",float("-inf"))
+
         actions = game_state.get_legal_actions(agent)
-        # min func starts with +inf
-        tempscore = highestScore = float("inf")
         for action in actions:
-            if nextAgent == 0:
-                # if next agent is packman and we r at proper depth
-                # set tempscore to the evaluationfunction
-                if depth == self.depth - 1:
-                    tempscore = self.evaluation_function(game_state.generate_successor(agent, action))
-                else:
-                    # if not pacman or proper depth, tempscore does another run of max incrementing depth
-                    tempscore = self.max_value(game_state.generate_successor(agent, action), depth + 1, alpha, beta)
+            # store in tuple (action, value)
+            tempscore = (action, self.minimax_alphaBeta(game_state.generate_successor(agent, action), agent + 1, depth + 1, alpha, beta))
+            # get the maximum tuple and return that
+            highestScore = self.getMaxTuple(highestScore, tempscore)
+            # prune stuff
+            if highestScore[1] > beta:
+                return highestScore
             else:
-                # if not pacman then tempscore runs this function again with the next ghost/agent
-                tempscore = self.min_value_recursive(game_state.generate_successor(agent, action), depth, nextAgent, alpha, beta)
-            # return min value here
-            if tempscore < highestScore:
-                highestScore = tempscore
-        # return min
+                alpha = max(alpha, highestScore[1])
+        # return max (action, value) tuple
         return highestScore
+
+    def minval(self, game_state, agent, depth, alpha, beta):
+        lowestScore = ("action",float("inf"))
+        actions = game_state.get_legal_actions(agent)
+        for action in actions:
+            tempscore = (action, self.minimax_alphaBeta(game_state.generate_successor(agent, action), agent + 1, depth + 1, alpha, beta))
+            lowestScore = self.getMinTuple(lowestScore, tempscore)
+            if lowestScore[1] < alpha:
+                return lowestScore
+            else:
+                beta = min(beta, lowestScore[1])
+        return lowestScore
+
+    def getMaxTuple(self, v1, v2):
+        if (v1[1] > v2[1]):
+            return v1
+        return v2
+
+    def getMinTuple(self, v1, v2):
+        if (v1[1] < v2[1]):
+            return v1
+        return v2
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
