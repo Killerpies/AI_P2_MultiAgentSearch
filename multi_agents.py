@@ -163,9 +163,67 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
 
         # *** YOUR CODE HERE ***
+        # print(game_state.get_legal_actions(0))
+        # print(game_state.get_legal_actions(1))
+        # game_state.generate_successor(0, "Center")
+        # game_state.generate_successor(0, "Center")
+        # game_state.generate_successor(1, "Center")
+        # game_state.generate_successor(1, "Center")
+        #
+        # print(game_state.get_num_agents())
+        # print(self.depth)
+        # print(self.evaluation_function(game_state.generate_successor(0, "Center")))
+        return self.max_value(game_state, 0)
 
-        util.raise_not_defined()
+    def max_value(self, game_state, depth):
+        if game_state.is_win() or game_state.is_lose():
+            return game_state.get_score()
+        actions = game_state.get_legal_actions(0)
+        # max func starts with -inf
+        tempscore = highestScore = float("-inf")
+        best_action = Directions.STOP
+        for action in actions:
+            # score = min function
+            tempscore = self.min_value_recursive(game_state.generate_successor(0, action), depth, 1)
+            # get max score here
+            if tempscore > highestScore:
+                highestScore = tempscore
+                best_action = action
+        # if depth is 0 then we found the best action
+        if depth == 0:
+            return best_action
+        else:
+            # otherwise return the highscore back to min function
+            return highestScore
 
+    def min_value_recursive(self, game_state, depth, agent):
+        if game_state.is_lose() or game_state.is_win():
+            return game_state.get_score()
+        # increment agent index + 1
+        nextAgent = agent + 1
+        # if at the end of agent list, reset back to pacman
+        if agent == game_state.get_num_agents() - 1:
+            nextAgent = 0
+        actions = game_state.get_legal_actions(agent)
+        # min func starts with +inf
+        tempscore = highestScore = float("inf")
+        for action in actions:
+            if nextAgent == 0:
+                # if next agent is packman and we r at proper depth
+                # set tempscore to the evaluationfunction
+                if depth == self.depth - 1:
+                    tempscore = self.evaluation_function(game_state.generate_successor(agent, action))
+                else:
+                    # if not pacman or proper depth, tempscore does another run of max incrementing depth
+                    tempscore = self.max_value(game_state.generate_successor(agent, action), depth + 1)
+            else:
+                # if not pacman then tempscore runs this function again with the next ghost/agent
+                tempscore = self.min_value_recursive(game_state.generate_successor(agent, action), depth, nextAgent)
+            # return min value here
+            if tempscore < highestScore:
+                highestScore = tempscore
+        # return min
+        return highestScore
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -178,9 +236,60 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
 
         # *** YOUR CODE HERE ***
+        alpha = float("-inf")
+        beta = float("+inf")
 
-        util.raise_not_defined()
+        return self.max_value(game_state, 0, alpha, beta)
 
+    def max_value(self, game_state, depth, alpha, beta):
+        if game_state.is_win() or game_state.is_lose():
+            return game_state.get_score()
+        actions = game_state.get_legal_actions(0)
+        # max func starts with -inf
+        tempscore = highestScore = float("-inf")
+        best_action = Directions.STOP
+        for action in actions:
+            # score = min function
+            tempscore = self.min_value_recursive(game_state.generate_successor(0, action), depth, 1)
+            # get max score here
+            if tempscore > highestScore:
+                highestScore = tempscore
+                best_action = action
+        # if depth is 0 then we found the best action
+        if depth == 0:
+            return best_action
+        else:
+            # otherwise return the highscore back to min function
+            return highestScore
+
+    def min_value_recursive(self, game_state, depth, agent, alpha, beta):
+        if game_state.is_lose() or game_state.is_win():
+            return game_state.get_score()
+        # increment agent index + 1
+        nextAgent = agent + 1
+        # if at the end of agent list, reset back to pacman
+        if agent == game_state.get_num_agents() - 1:
+            nextAgent = 0
+        actions = game_state.get_legal_actions(agent)
+        # min func starts with +inf
+        tempscore = highestScore = float("inf")
+        for action in actions:
+            if nextAgent == 0:
+                # if next agent is packman and we r at proper depth
+                # set tempscore to the evaluationfunction
+                if depth == self.depth - 1:
+                    tempscore = self.evaluation_function(game_state.generate_successor(agent, action))
+                else:
+                    # if not pacman or proper depth, tempscore does another run of max incrementing depth
+                    tempscore = self.max_value(game_state.generate_successor(agent, action), depth + 1, alpha, beta)
+            else:
+                # if not pacman then tempscore runs this function again with the next ghost/agent
+                tempscore = self.min_value_recursive(game_state.generate_successor(agent, action), depth, nextAgent, alpha, beta)
+            # return min value here
+            if tempscore < highestScore:
+                highestScore = tempscore
+        # return min
+        return highestScore
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
