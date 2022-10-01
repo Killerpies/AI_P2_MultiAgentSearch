@@ -310,7 +310,59 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
         # *** YOUR CODE HERE ***
 
-        util.raise_not_defined()
+        returnvalue = self.maxval(game_state, 0, 0, "action")
+        return returnvalue[0]
+
+    def expectimax(self, game_state, agent, depth, currentAction):
+        # This problem still took 10 years but this function makes it significantly easier
+        # Compared to the way i did it on the last one
+        if depth == self.depth * game_state.get_num_agents() or game_state.is_lose() or game_state.is_win():
+            a = self.evaluation_function(game_state)
+            # print(a)
+            return a
+        if agent == game_state.get_num_agents():
+            agent = 0
+        if agent == 0:
+            a = self.maxval(game_state, agent, depth, currentAction)
+            # print(a)
+            return a[1]
+        else:
+            a = self.expval(game_state, agent, depth, currentAction)
+            return a[1]
+
+    def maxval(self, game_state, agent, depth, currentAction):
+        highestScore = ("action", float("-inf"))
+
+        actions = game_state.get_legal_actions(agent)
+        for action in actions:
+            if depth != self.depth * game_state.get_num_agents():
+                nextAction = currentAction
+            else:
+                nextAction = action
+            tempscore = (action,
+                         self.expectimax(game_state.generate_successor(agent, action), agent + 1, depth + 1,
+                                         nextAction))
+            highestScore = self.getMaxTuple(highestScore, tempscore)
+        return highestScore
+
+    def expval(self, game_state, agent, depth, currentAction):
+        actions = game_state.get_legal_actions(agent)
+        average = 0
+        p = 1.0/len(actions)
+        for action in actions:
+            tempscore = (action, self.expectimax(game_state.generate_successor(agent, action), agent + 1, depth + 1, currentAction))
+            average = tempscore[1] * p
+        return (currentAction, average)
+
+    def getMaxTuple(self, v1, v2):
+        if (v1[1] > v2[1]):
+            return v1
+        return v2
+
+    def getMinTuple(self, v1, v2):
+        if (v1[1] < v2[1]):
+            return v1
+        return v2
 
 
 def better_evaluation_function(current_game_state):
@@ -329,7 +381,7 @@ def better_evaluation_function(current_game_state):
     new_food = successor_game_state.get_food()
     new_ghost_states = successor_game_state.get_ghost_states()
 
-    util.raise_not_defined()
+
 
 
 # Abbreviation
